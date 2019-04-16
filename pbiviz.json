@@ -11,8 +11,8 @@
   },
   "apiVersion":"2.3.2",
   "author":{
-    "name":"",
-    "email":""
+    "name":"Denis Lapatkin",
+    "email":"v-delapa@microsoft.com"
   },
   "assets":{
     "icon":"assets/icon.png"

@@ -41,28 +41,30 @@ import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions;
 import VisualConstructorOptions = powerbi.extensibility.visual.VisualConstructorOptions;
 import IVisualEventService =  powerbi.extensibility.IVisualEventService;
 
-import ReactContainer from "./container";
-import ReactComponent from "./component";
-import "./../style/visual.less";
+import ReactContainer from "./ReactContainer";
 
-import { VisualSettings } from "./settings";
+import { VisualSettings } from "../settings";
 
-export class Visual implements IVisual {
-    private target: HTMLElement;
-    private host: IVisualHost;
-    private settings: VisualSettings;
-    private events: IVisualEventService;
+export class ReactVisual implements IVisual {
+    protected target: HTMLElement;
+    protected host: IVisualHost;
+    protected settings: VisualSettings;
+    protected events: IVisualEventService;
 
-    private container: React.ComponentElement<any, any>;
+    protected container: React.ComponentElement<any, any>;
 
-    private updateContainers: (data: object) => void;
+    protected updateContainers: (data: object) => void;
 
-    private static shouldVisualUpdate(options: VisualUpdateOptions): boolean {
+    protected static shouldVisualUpdate(options: VisualUpdateOptions): boolean {
       return !!(options && options.dataViews && options.dataViews[0])
     }
 
-    private static parseSettings(dataView: DataView): VisualSettings {
+    protected static parseSettings(dataView: DataView): VisualSettings {
       return VisualSettings.parse(dataView) as VisualSettings;
+    }
+
+    public render(props: {}): React.ReactElement {
+      return React.createElement('div', props);
     }
 
     constructor(options: VisualConstructorOptions) {
@@ -70,23 +72,24 @@ export class Visual implements IVisual {
         this.host = options.host;
 
         this.target = options.element;
-        this.container = React.createElement(ReactContainer, { component: ReactComponent });
+        this.container = React.createElement(ReactContainer, { component: this.render });
         this.updateContainers = ReactContainer.update;
 
         ReactDOM.render(this.container, this.target);
     }
-    
+
     public update(options: VisualUpdateOptions) {
-      if (!Visual.shouldVisualUpdate(options)){
+      if (!ReactVisual.shouldVisualUpdate(options)){
         return;
       }
 
       try {
         this.events.renderingStarted(options);
-        this.settings = Visual.parseSettings(options.dataViews[0]);
+        this.settings = ReactVisual.parseSettings(options.dataViews[0]);
         console.log('options', options, 'settings', this.settings);
+
         this.updateContainers(options);
-        this.events.renderingFinished(options);
+        this.events.renderingFinished(options); 
       }
       catch (e) {
           console.error(e);

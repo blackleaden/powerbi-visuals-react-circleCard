@@ -44,6 +44,7 @@ export class ReactContainer extends React.Component<ContainerProps, ContainerSta
   }
   
   public update (newData: object) {
+    console.log('newData', newData);
     this.setState({ data: { ...this.state.data, ...newData }})
   }
   
