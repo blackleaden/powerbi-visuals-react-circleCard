@@ -1,0 +1,16 @@
+node_modules
+coverage
+.DS_Store
+
+.api
+dist
+typings
+*.log
+.idea/*
+
+.tmp
+*.dev.*
+tmp.*
+
+webpack\.statistics\.*html
+webpack.statistics.*.html
