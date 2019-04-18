@@ -1,37 +1,54 @@
 import * as React from "react";
-import { ReactVisual } from './powerbi-visual-react';
 import powerbi from "powerbi-visuals-api";
+import * as ReactDOM from "react-dom";
+
+import DataView = powerbi.DataView;
+import VisualObjectInstance = powerbi.VisualObjectInstance;
+
+import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInstancesOptions;
+import VisualObjectInstanceEnumerationObject = powerbi.VisualObjectInstanceEnumerationObject;
 
 import IVisual = powerbi.extensibility.visual.IVisual;
+import IVisualHost = powerbi.extensibility.visual.IVisualHost;
 import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions;
+import VisualConstructorOptions = powerbi.extensibility.visual.VisualConstructorOptions;
 
-import "./../style/visual.less";
+import ReactCircleCard from "./component";
+import { VisualSettings } from "./settings";
 
-export class Visual extends ReactVisual implements IVisual {
-  public update(options: VisualUpdateOptions) {
-    super.update(options)
-  }
-  
-  public render(props: VisualUpdateOptions): React.ReactElement {
-    console.log('props', props);
-    if (props.dataViews && props.dataViews[0]) {
-      const dataView = props.dataViews[0];
-      const textLabel = dataView.metadata.columns[0].displayName;
-      const textValue = dataView.single.value;
-      return (
-        <div className="circleCard">
-          <p>{textLabel} 
-          <br/>
-          <em>{textValue}</em>
-          </p>
-        </div>
-      )
+export class Visual implements IVisual {
+    protected target: HTMLElement;
+    protected host: IVisualHost;
+    protected settings: VisualSettings;
+    protected root: React.ComponentElement<any, any>;
+
+    constructor(options: VisualConstructorOptions) {
+        this.host = options.host;
+        this.root = React.createElement(ReactCircleCard, {});
+        this.target = options.element;
+
+        ReactDOM.render(this.root, this.target);
     }
-    return (
-      <div >
-        Hello React Card!
-      </div>
-    )
 
+    public update(options: VisualUpdateOptions) {
+
+        if(options.dataViews && options.dataViews[0]){
+            const dataView: DataView = options.dataViews[0];
+            this.settings = VisualSettings.parse(dataView) as VisualSettings;
+            const object = this.settings.circle;
+            
+            ReactCircleCard.update({
+                color: object && object.circleColor ? object.circleColor : undefined,
+                textLabel: dataView.metadata.columns[0].displayName,
+                textValue: dataView.single.value.toString()
+            });
+        }
+  }
+
+  public enumerateObjectInstances(
+    options: EnumerateVisualObjectInstancesOptions
+  ): VisualObjectInstance[] | VisualObjectInstanceEnumerationObject {
+
+    return VisualSettings.enumerateObjectInstances(this.settings || VisualSettings.getDefault(), options);
   }
 }
