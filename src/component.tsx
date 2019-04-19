@@ -1,24 +1,19 @@
-
 "use strict";
+import "@babel/polyfill";
 import * as React from "react";
-
-import powerbi from "powerbi-visuals-api";
-import DataView = powerbi.DataView;
-import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions;
-
-import "./../style/visual.less";
-import { VisualSettings } from "./settings";
 
 export interface State {
     textLabel: string,
     textValue: string,
-    color?: string,
-    textSize?: number
+    size: number,
+    background?: string,
+    borderWidth?: number
 }
 
 const initialState: State = {
     textLabel: "",
-    textValue: ""
+    textValue: "",
+    size: 200
 }
 
 export class ReactCircleCard extends React.Component<{}, State>{
@@ -40,26 +35,19 @@ export class ReactCircleCard extends React.Component<{}, State>{
         ReactCircleCard.updateCallback = null;
     }
 
-    render(): React.ReactElement{
-        const { textLabel, textValue, color } = this.state;
+    render(){
+        const { textLabel, textValue, size, background, borderWidth } = this.state;
 
-        const style = color
-            ? { background: color } 
-            : {};
+        const style: React.CSSProperties = { width: size, height: size, background, borderWidth };
 
         return (
-            <div className="circleCard">
-                <p>
-                    {textLabel}
+            <div className="circleCard" style={style}>
+                <p>{textLabel}
                     <br/>
-                    <em style={style}>{textValue}</em>
+                    <em>{textValue}</em>
                 </p>
             </div>
         )
-    }
-
-    public update = (newState: State): void => {
-        this.setState(newState);
     }
 }
 
