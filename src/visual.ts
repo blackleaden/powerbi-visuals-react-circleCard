@@ -39,8 +39,7 @@ import VisualObjectInstance = powerbi.VisualObjectInstance;
 import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInstancesOptions;
 import VisualObjectInstanceEnumerationObject = powerbi.VisualObjectInstanceEnumerationObject;
 
-import ReactCircleCard from "./component";
-
+import { ReactCircleCard, initialState } from "./component";
 import { VisualSettings } from "./settings";
 import "./../style/visual.less";
 
@@ -75,7 +74,13 @@ export class Visual implements IVisual {
                 textLabel: dataView.metadata.columns[0].displayName,
                 textValue: dataView.single.value.toString()
             });
+        } else {
+            this.clear();
         }
+    }
+
+    private clear() {
+        ReactCircleCard.update(initialState);
     }
 
     public enumerateObjectInstances(
